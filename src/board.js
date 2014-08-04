@@ -1,5 +1,5 @@
 define([
 	'./core',
 	'./geom',
-	'./math',
+	'./matrix',
 ], function( BoardJS ) { return BoardJS; });
