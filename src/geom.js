@@ -40,6 +40,7 @@ define(['./core'], function( BoardJS ) {
 	};
 
 	BoardJS.Geom.Point.prototype = {
+
 		get bounds() {
 			return [this.x, this.y, 0, 0];
 		},
@@ -60,6 +61,22 @@ define(['./core'], function( BoardJS ) {
 			this.x -= point.x;
 			this.y -= point.y;
 			return this;
+		},
+
+		distanceTo : function(/* point */) {
+			
+			var point = BoardJS.Geom.Point.read(arguments);
+
+			var xs = 0;
+			var ys = 0;
+
+			xs = point.x - this.x;
+			xs = xs * xs;
+
+			ys = point.y - this.y;
+			ys = ys * ys;
+
+			return Math.sqrt( xs + ys );
 		},
 
 		rotate : function( angle, center ) {
