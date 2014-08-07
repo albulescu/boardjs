@@ -1,3 +1,5 @@
+'use strict';
+
 define(['./core'], function( BoardJS ) {
 
 	BoardJS.Geom = {};
@@ -7,14 +9,14 @@ define(['./core'], function( BoardJS ) {
 		get bounds() {
 			return null;
 		}
-	}
+	};
 
 
 	var geom = function( c ) {
 		c.prototype = BoardJS.Geom.Base.prototype;
 		c.prototype.constructor = c;
 		return c;
-	}
+	};
 
 	BoardJS.Geom.Point = geom(function( x, y ) {
 		this.x = x;
@@ -23,7 +25,7 @@ define(['./core'], function( BoardJS ) {
 	
 	BoardJS.Geom.Point.read = function( p ) {
 		
-		if( p.length == 1 && 
+		if( p.length === 1 && 
 			p[0] instanceof BoardJS.Geom.Point) {
 			return p[0];
 		}
@@ -36,7 +38,7 @@ define(['./core'], function( BoardJS ) {
 			}
 		}
 
-		throw new Error("Invalid params");
+		throw new Error('Invalid params');
 	};
 
 	BoardJS.Geom.Point.prototype = {
@@ -94,7 +96,7 @@ define(['./core'], function( BoardJS ) {
 			point = new BoardJS.Geom.Point(
 				point.x * c - point.y * s,
 				point.x * s + point.y * c
-			)
+			);
 
 			if( center ) {
 				point.add(center);
@@ -115,7 +117,7 @@ define(['./core'], function( BoardJS ) {
 			this.x = this.x * -1;
 			this.y = this.y * -1;
 		},
-	}
+	};
 
 	BoardJS.Geom.Rect = geom(function( x, y, w, h ) {
 		this.x = x;

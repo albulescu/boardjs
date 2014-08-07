@@ -1,165 +1,232 @@
-module.exports = function( grunt ) {
-	"use strict";
+// Generated on 2014-07-31 using generator-angular 0.9.5
+'use strict';
 
-	function readOptionalJSON( filepath ) {
-		var data = {};
-		try {
-			data = grunt.file.readJSON( filepath );
-		} catch ( e ) {}
-		return data;
-	}
+// # Globbing
+// for performance reasons we're only matching one level down:
+// 'test/spec/{,*/}*.js'
+// use this if you want to recursively match all subfolders:
+// 'test/spec/**/*.js'
 
-	var gzip = require( "gzip-js" ),
-		srcHintOptions = readOptionalJSON( "src/.jshintrc" );
+module.exports = function (grunt) {
 
-	// The concatenated file won't pass onevar
-	// But our modules can
-	delete srcHintOptions.onevar;
+  // Load grunt tasks automatically
+  require('load-grunt-tasks')(grunt);
 
-	grunt.initConfig({
-		pkg: grunt.file.readJSON( "package.json" ),
-		dst: readOptionalJSON( "dist/.destination.json" ),
-		"compare_size": {
-			files: [ "dist/jquery.js", "dist/jquery.min.js" ],
-			options: {
-				compress: {
-					gz: function( contents ) {
-						return gzip.zip( contents, {} ).length;
-					}
-				},
-				cache: "build/.sizecache.json"
-			}
-		},
-		build: {
-			all: {
-				dest: "dist/jquery.js",
-				minimum: [
-					"core",
-					"selector"
-				],
-				// Exclude specified modules if the module matching the key is removed
-				removeWith: {
-					ajax: [ "manipulation/_evalUrl", "event/ajax" ],
-					callbacks: [ "deferred" ],
-					css: [ "effects", "dimensions", "offset" ],
-					sizzle: [ "css/hiddenVisibleSelectors", "effects/animatedSelector" ]
-				}
-			}
-		},
-		npmcopy: {
-			all: {
-				options: {
-					destPrefix: "external"
-				},
-				files: {
-					"sizzle/dist": "sizzle/dist",
-					"sizzle/LICENSE.txt": "sizzle/LICENSE.txt",
+  // Time how long tasks take. Can help when optimizing build times
+  require('time-grunt')(grunt);
 
-					"qunit/qunit.js": "qunitjs/qunit/qunit.js",
-					"qunit/qunit.css": "qunitjs/qunit/qunit.css",
-					"qunit/MIT-LICENSE.txt": "qunitjs/MIT-LICENSE.txt",
+  // Configurable paths for the application
+  var appConfig = {
+    app: 'src',
+    dist: 'dist'
+  };
 
-					"requirejs/require.js": "requirejs/require.js",
+  // Define the configuration for all the tasks
+  grunt.initConfig({
 
-					"sinon/fake_timers.js": "sinon/lib/sinon/util/fake_timers.js",
-					"sinon/LICENSE.txt": "sinon/LICENSE"
-				}
-			}
-		},
-		jsonlint: {
-			pkg: {
-				src: [ "package.json" ]
-			},
+    // Project settings
+    config: appConfig,
 
-			bower: {
-				src: [ "bower.json" ]
-			}
-		},
-		jshint: {
-			all: {
-				src: [
-					"src/**/*.js", "Gruntfile.js", "test/**/*.js", "build/**/*.js"
-				],
-				options: {
-					jshintrc: true
-				}
-			},
-			dist: {
-				src: "dist/jquery.js",
-				options: srcHintOptions
-			}
-		},
-		jscs: {
-			src: "src/**/*.js",
-			gruntfile: "Gruntfile.js",
+    // Watches files for changes and runs tasks based on the changed files
+    watch: {
+      bower: {
+        files: ['bower.json'],
+        tasks: ['wiredep']
+      },
+      js: {
+        files: ['<%= config.app %>/{,*/}*.js'],
+        tasks: ['newer:jshint:all'],
+        options: {
+          livereload: '<%= connect.options.livereload %>'
+        }
+      },
+      jsTest: {
+        files: ['test/spec/{,*/}*.js'],
+        tasks: ['newer:jshint:test', 'karma']
+      },
+      gruntfile: {
+        files: ['Gruntfile.js']
+      },
+      livereload: {
+        options: {
+          livereload: '<%= connect.options.livereload %>'
+        },
+        files: [
+          '<%= config.app %>/{,*/}*.html',
+          '.tmp/styles/{,*/}*.css',
+          '<%= config.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+        ]
+      }
+    },
 
-			// Right now, check only test helpers
-			test: [ "test/data/testrunner.js" ],
-			release: [ "build/*.js", "!build/release-notes.js" ],
-			tasks: "build/tasks/*.js"
-		},
-		testswarm: {
-			tests: [
-				"ajax",
-				"attributes",
-				"callbacks",
-				"core",
-				"css",
-				"data",
-				"deferred",
-				"dimensions",
-				"effects",
-				"event",
-				"manipulation",
-				"offset",
-				"queue",
-				"selector",
-				"serialize",
-				"support",
-				"traversing"
-			]
-		},
-		watch: {
-			files: [ "<%= jshint.all.src %>" ],
-			tasks: "dev"
-		},
-		uglify: {
-			all: {
-				files: {
-					"dist/jquery.min.js": [ "dist/jquery.js" ]
-				},
-				options: {
-					preserveComments: false,
-					sourceMap: true,
-					sourceMapName: "dist/jquery.min.map",
-					report: "min",
-					beautify: {
-						"ascii_only": true
-					},
-					banner: "/*! jQuery v<%= pkg.version %> | " +
-						"(c) 2005, <%= grunt.template.today('yyyy') %> jQuery Foundation, Inc. | " +
-						"jquery.org/license */",
-					compress: {
-						"hoist_funs": false,
-						loops: false,
-						unused: false
-					}
-				}
-			}
-		}
-	});
+    // The actual grunt server settings
+    connect: {
+      options: {
+        port: 9000,
+        // Change this to '0.0.0.0' to access the server from outside.
+        hostname: 'localhost',
+        livereload: 35729
+      },
+      livereload: {
+        options: {
+          open: true,
+          middleware: function (connect) {
+            return [
+              connect.static('.tmp'),
+              connect().use(
+                './src',
+                connect.static('./src')
+              ),
+              connect.static(__dirname)
+            ];
+          }
+        }
+      },
+      test: {
+        options: {
+          port: 9001,
+          middleware: function (connect) {
+            return [
+              connect.static('.tmp'),
+              connect.static('./test'),
+              connect.static('./dist'),
+              connect.directory('./')
+            ];
+          }
+        }
+      },
+      dist: {
+        options: {
+          open: true,
+          base: '<%= config.dist %>'
+        }
+      }
+    },
 
-	// Load grunt tasks from NPM packages
-	require( "load-grunt-tasks" )( grunt );
+    // Make sure code styles are up to par and there are no obvious mistakes
+    jshint: {
+      options: {
+        jshintrc: './src/.jshintrc',
+        reporter: require('jshint-stylish')
+      },
+      all: {
+        src: [
+          'Gruntfile.js',
+          '<%= config.app %>/{,*/}*.js'
+        ]
+      },
+      test: {
+        options: {
+          jshintrc: 'test/.jshintrc'
+        },
+        src: ['test/spec/{,*/}*.js']
+      }
+    },
 
-	// Integrate jQuery specific tasks
-	grunt.loadTasks( "build/tasks" );
+    // Empties folders to start fresh
+    clean: {
+      dist: {
+        files: [{
+          dot: true,
+          src: [
+            '.tmp',
+            '<%= config.dist %>/{,*/}*',
+            '!<%= config.dist %>/.git*'
+          ]
+        }]
+      },
+      server: '.tmp'
+    },
 
-	grunt.registerTask( "lint", [ "jshint", "jscs" ] );
+    // Copies remaining files to places other tasks can use
+    copy: {
+      dist: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%= config.app %>',
+          dest: '<%= config.dist %>',
+          src: [
+            '*.{ico,png,txt}',
+            '.htaccess',
+            '*.html',
+            'views/{,*/}*.html',
+            'images/{,*/}*.{webp}',
+            'fonts/*'
+          ]
+        }, {
+          expand: true,
+          cwd: '.tmp/images',
+          dest: '<%= config.dist %>/images',
+          src: ['generated/*']
+        }, {
+          expand: true,
+          cwd: '.',
+          src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
+          dest: '<%= config.dist %>'
+        }]
+      },
+      styles: {
+        expand: true,
+        cwd: '<%= config.app %>/styles',
+        dest: '.tmp/styles/',
+        src: '{,*/}*.css'
+      }
+    },
 
-	// Short list as a high frequency watch task
-	grunt.registerTask( "dev", [ "build:*:*", "lint" ] );
+    // Test settings
+    karma: {
+      unit: {
+        configFile: 'test/karma.conf.js',
+        singleRun: true
+      }
+    },
 
-	// Default grunt
-	grunt.registerTask( "default", [ "jsonlint", "dev", "uglify", "dist:*", "compare_size" ] );
+    requirejs: {
+        compile: {
+            options: {
+                optimize: "uglify",
+                baseUrl: 'src',
+                name : 'board',
+                out: "<%= config.dist %>/app.js"
+            }
+        }
+    }
+  });
+
+
+  grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
+    if (target === 'dist') {
+      return grunt.task.run(['build', 'connect:dist:keepalive']);
+    }
+
+    grunt.task.run([
+      'clean:server',
+      'connect:livereload',
+      'watch'
+    ]);
+  });
+
+  grunt.registerTask('server', 'DEPRECATED TASK. Use the "serve" task instead', function (target) {
+    grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
+    grunt.task.run(['serve:' + target]);
+  });
+
+  grunt.registerTask('test', [
+    'clean:server',
+    'connect:test',
+    'build',
+    'karma'
+  ]);
+
+  grunt.registerTask('build', [
+    'clean:dist',
+    'requirejs'
+  ]);
+
+  grunt.registerTask('default', [
+    'newer:jshint',
+    'test',
+    'build'
+  ]);
 };

@@ -1,3 +1,5 @@
+'use strict';
+
 define(['./core'], function( BoardJS ){
 	
 	BoardJS.Formatter = {
@@ -29,13 +31,11 @@ define(['./core'], function( BoardJS ){
 		},
 
 		size: function(val, separator) {
-			return this.number(val.width) + (separator || ',')
-					+ this.number(val.height);
+			return this.number(val.width) + (separator || ',') + this.number(val.height);
 		},
 
 		rectangle: function(val, separator) {
-			return this.point(val, separator) + (separator || ',')
-					+ this.size(val, separator);
+			return this.point(val, separator) + (separator || ',') + this.size(val, separator);
 		}
 	};
 

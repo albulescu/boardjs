@@ -17,6 +17,8 @@
       var angle = 0;
       var p = new BoardJS.Geom.Point(400, 400);
 
+      var step = 0;
+
       var tic = function() {
         
         ctx.clearRect ( 0, 0, 500, 500 );
@@ -27,6 +29,7 @@
 
         requestAnimationFrame(tic);
 
+        step++;
       };
 
       tic()

@@ -1,13 +1,15 @@
+'use strict';
+
 define(['./core', './formatter'], function(BoardJS, Formatter) {
 
-	BoardJS.Matrix = function() {
+	BoardJS.Matrix = function( arg ) {
 
 		var count = arguments.length,
 			ok = true;
 		if (count === 6) {
 			this.set.apply(this, arguments);
 		} else if (count === 1) {
-			if (arg instanceof Matrix) {
+			if (arg instanceof BoardJS.Matrix) {
 				this.set(arg._a, arg._c, arg._b, arg._d, arg._tx, arg._ty);
 			} else if (Array.isArray(arg)) {
 				this.set.apply(this, arg);
@@ -19,8 +21,9 @@ define(['./core', './formatter'], function(BoardJS, Formatter) {
 		} else {
 			ok = false;
 		}
-		if (!ok)
+		if (!ok) {
 			throw new Error('Unsupported matrix parameters');
+		}
 	};
 
 	BoardJS.Matrix.prototype = {
@@ -36,7 +39,7 @@ define(['./core', './formatter'], function(BoardJS, Formatter) {
 		},
 
 		clone: function() {
-			return new Matrix(this._a, this._c, this._b, this._d,
+			return new BoardJS.Matrix(this._a, this._c, this._b, this._d,
 					this._tx, this._ty);
 		},
 
@@ -45,8 +48,8 @@ define(['./core', './formatter'], function(BoardJS, Formatter) {
 		 */
 		toString: function() {
 			return '[[' + [Formatter.number(this._a), Formatter.number(this._b),
-						Formatter.number(this._tx)].join(', ') + '], ['
-					+ [Formatter.number(this._c), Formatter.number(this._d),
+						Formatter.number(this._tx)].join(', ') + '], [' +
+						[Formatter.number(this._c), Formatter.number(this._d),
 						Formatter.number(this._ty)].join(', ') + ']]';
 		},
 
